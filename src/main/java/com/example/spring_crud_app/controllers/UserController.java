@@ -19,6 +19,7 @@ import com.example.spring_crud_app.services.UserService;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -37,7 +38,8 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        System.out.println("Received User: " + user);
         return userService.createUser(user);
     }
 

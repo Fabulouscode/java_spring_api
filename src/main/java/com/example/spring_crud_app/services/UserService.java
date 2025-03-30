@@ -1,8 +1,11 @@
 package com.example.spring_crud_app.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.spring_crud_app.models.User;
@@ -24,8 +27,17 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public ResponseEntity<?> createUser(User user) {
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser.isPresent()) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Email already exists!");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(savedUser);
     }
 
     public User updateUser(Long id, User userDetails) {
