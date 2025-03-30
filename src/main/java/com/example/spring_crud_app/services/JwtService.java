@@ -16,11 +16,11 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "$2a$10$b2NpiRWvfCDhwv330YXpI.SuIxO00mHb7bkfWc.z75oCfTAvIk/Pq";
+    private static final String SECRET_KEY = "$2a$10$b2NpiRWvfCDhwv330YXpI.SuIxO00mHb7bkfWc.z75oCfTAvIk/Pq";
 
     public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(email) // Store email instead of username
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1-hour validity
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
@@ -47,7 +47,7 @@ public class JwtService {
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey()) // New method to handle key
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

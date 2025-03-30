@@ -39,7 +39,6 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        System.out.println("Received User: " + user);
         return userService.createUser(user);
     }
 
