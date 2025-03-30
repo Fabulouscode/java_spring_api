@@ -1,9 +1,13 @@
 package com.example.spring_crud_app.models;
 
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,6 +39,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles;
+
     public String getName() {
         return name;
     }
@@ -58,5 +65,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }
