@@ -16,12 +16,14 @@ import com.example.spring_crud_app.repositories.UserRepository;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, EmailService emailService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     public List<User> getAllUsers() {
@@ -44,6 +46,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
+
+        emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getName());
+
         return ResponseEntity.ok(savedUser);
     }
 
