@@ -4,6 +4,9 @@ import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +19,20 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "$2a$10$b2NpiRWvfCDhwv330YXpI.SuIxO00mHb7bkfWc.z75oCfTAvIk/Pq";
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+
+    // private static final String SECRET_KEY =
+    // "Nmzv7xyx3PtdfOQJ8fsWi2oGZ7Vks4cXPX+j+egVcP0=";
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1-hour validity
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -32,8 +41,15 @@ public class JwtService {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String email = extractEmail(token);
+            boolean isValid = (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+            logger.info("Token Valid: " + isValid);
+            return isValid;
+        } catch (Exception e) {
+            logger.error("Token validation failed: " + e.getMessage());
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -41,7 +57,7 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
