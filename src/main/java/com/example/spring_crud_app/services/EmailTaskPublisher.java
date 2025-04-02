@@ -16,7 +16,7 @@ public class EmailTaskPublisher {
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
-    private ObjectMapper objectMapper; // Converts Java objects to JSON
+    private ObjectMapper objectMapper;
 
     public void enqueueEmailTask(String email, String name) {
         try {
@@ -25,7 +25,7 @@ public class EmailTaskPublisher {
             emailTask.put("name", name);
 
             String jsonTask = objectMapper.writeValueAsString(emailTask);
-            redisTemplate.opsForList().rightPush("emailQueue", jsonTask); // Store JSON in Redis queue
+            redisTemplate.opsForList().rightPush("emailQueue", jsonTask);
         } catch (Exception e) {
             System.err.println("Failed to enqueue email task: " + e.getMessage());
         }
